@@ -3,7 +3,7 @@ Getting Started with garpr (windows)
 
 This getting started is targeted at developers and people already somewhat familiar with interacting with the challonge api.
 
-In this exampled, we will go through the process of setting up a mongodb database, importing tournament results from challonge, and generating rankings for your region.
+In this example, we will go through the process of setting up a mongodb database, importing tournament results from challonge, and generating rankings for your region.
 
 To get started with garpr you need an installation of Python 2.7 and an installation of mongodb.
 
