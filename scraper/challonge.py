@@ -52,13 +52,13 @@ class ChallongeScraper(object):
         player_map = dict((p['participant']['id'], p['participant']['name'].strip() 
                            if p['participant']['name'] 
                            else p['participant']['username'].strip()) 
-                          for p in self.get_raw()['participants'])
+                          for p in self.get_raw()['participants'])  
 
         matches = []
         for m in self.get_raw()['matches']:
-            m = m['match']
-            winner_id = m['winner_id']
-            loser_id = m['loser_id']
+            match = m['match']
+            winner_id = match['winner_id']
+            loser_id = match['loser_id']            
             if winner_id is not None and loser_id is not None:
                 winner = player_map[winner_id]
                 loser = player_map[loser_id]
