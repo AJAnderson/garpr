@@ -8,9 +8,9 @@ from config.config import Config
 
 CONFIG_FILE_PATH = 'config/config.ini'
 BASE_CHALLONGE_API_URL = 'https://api.challonge.com/v1/tournaments'
-TOURNAMENT_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s.json')
-PARTICIPANTS_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s', 'participants.json')
-MATCHES_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s', 'matches.json')
+TOURNAMENT_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s.json').replace("\\","/")
+PARTICIPANTS_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s', 'participants.json').replace("\\","/")
+MATCHES_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s', 'matches.json').replace("\\","/")
 
 # http://api.challonge.com/v1
 class ChallongeScraper(object):
