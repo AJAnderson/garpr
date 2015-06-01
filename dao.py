@@ -11,7 +11,7 @@ TOURNAMENTS_COLLECTION_NAME = 'tournaments'
 RANKINGS_COLLECTION_NAME = 'rankings'
 REGIONS_COLLECTION_NAME = 'regions'
 USERS_COLLECTION_NAME = 'users'
-INACTIVE_LIMIT = 365
+INACTIVE_LIMIT = 90
 
 class RegionNotFoundException(Exception):
     pass

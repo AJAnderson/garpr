@@ -1,8 +1,8 @@
 [database]
-host=HOSTNAME
-auth_db=AUTH_DB
-user=USER
-password=PASSWORD
+host='local'
+auth_db=meleedata
+user=Alex
+password=retro10
 
 [challonge]
 api_key=API_KEY

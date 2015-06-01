@@ -8,12 +8,18 @@ from config.config import Config
 
 CONFIG_FILE_PATH = 'config/config.ini'
 BASE_CHALLONGE_API_URL = 'https://api.challonge.com/v1/tournaments'
-TOURNAMENT_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s.json').replace("\\","/")
-PARTICIPANTS_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s', 'participants.json').replace("\\","/")
-MATCHES_URL = os.path.join(BASE_CHALLONGE_API_URL, '%s', 'matches.json').replace("\\","/")
+TOURNAMENT_URL = os.path.join(
+    BASE_CHALLONGE_API_URL, '%s.json').replace("\\", "/")
+PARTICIPANTS_URL = os.path.join(
+    BASE_CHALLONGE_API_URL, '%s', 'participants.json').replace("\\", "/")
+MATCHES_URL = os.path.join(
+    BASE_CHALLONGE_API_URL, '%s', 'matches.json').replace("\\", "/")
 
 # http://api.challonge.com/v1
+
+
 class ChallongeScraper(object):
+
     def __init__(self, tournament_id):
         self.tournament_id = tournament_id
         self.config = Config(config_file_path=CONFIG_FILE_PATH)
@@ -24,7 +30,7 @@ class ChallongeScraper(object):
         self.get_raw()
 
     def get_raw(self):
-        if self.raw_dict == None:
+        if self.raw_dict is None:
             self.raw_dict = {}
 
             url = TOURNAMENT_URL % self.tournament_id
@@ -32,13 +38,16 @@ class ChallongeScraper(object):
             print(self.api_key_dict)
             rawrequest = requests.get(url, params=self.api_key_dict).request
             print(rawrequest.path_url)
-            self.raw_dict['tournament'] = self._check_for_200(requests.get(url, params=self.api_key_dict)).json()
+            self.raw_dict['tournament'] = self._check_for_200(
+                requests.get(url, params=self.api_key_dict)).json()
 
             url = MATCHES_URL % self.tournament_id
-            self.raw_dict['matches'] = self._check_for_200(requests.get(url, params=self.api_key_dict)).json()
+            self.raw_dict['matches'] = self._check_for_200(
+                requests.get(url, params=self.api_key_dict)).json()
 
             url = PARTICIPANTS_URL % self.tournament_id
-            self.raw_dict['participants'] = self._check_for_200(requests.get(url, params=self.api_key_dict)).json()
+            self.raw_dict['participants'] = self._check_for_200(
+                requests.get(url, params=self.api_key_dict)).json()
 
         return self.raw_dict
 
@@ -48,17 +57,37 @@ class ChallongeScraper(object):
     def get_date(self):
         return iso8601.parse_date(self.get_raw()['tournament']['tournament']['created_at'])
 
+    def get_unplayed_matches(self):
+        player_map = dict((p['participant']['id'], p['participant']['name'].strip()
+                           if p['participant']['name']
+                           else p['participant']['username'].strip())
+                          for p in self.get_raw()['participants'])
+
+        # Build a map from matches to involved parties
+        match = {m['match']['id']: (m['match']['player1_id'], m['match'][
+            'player2_id'])
+            for m in self.get_raw()['matches'] if m['match']['state'] == 'open'}
+
+        # Clean up the dict (remove none keys)
+        match = {k: v for k, v in match.items() if (v[0] and v[1])}
+
+        # Change player id keys to names
+        match = {k: (player_map[v[0]], player_map[v[1]])
+                 for k, v in match.items() if (v[0] and v[1])}
+
+        return match
+
     def get_matches(self):
-        player_map = dict((p['participant']['id'], p['participant']['name'].strip() 
-                           if p['participant']['name'] 
-                           else p['participant']['username'].strip()) 
-                          for p in self.get_raw()['participants'])  
+        player_map = dict((p['participant']['id'], p['participant']['name'].strip()
+                           if p['participant']['name']
+                           else p['participant']['username'].strip())
+                          for p in self.get_raw()['participants'])
 
         matches = []
         for m in self.get_raw()['matches']:
             match = m['match']
             winner_id = match['winner_id']
-            loser_id = match['loser_id']            
+            loser_id = match['loser_id']
             if winner_id is not None and loser_id is not None:
                 winner = player_map[winner_id]
                 loser = player_map[loser_id]
@@ -68,12 +97,12 @@ class ChallongeScraper(object):
         return matches
 
     def get_players(self):
-        return [p['participant']['name'].strip() if p['participant']['name'] else p['participant']['username'].strip() \
+        return [p['participant']['name'].strip() if p['participant']['name'] else p['participant']['username'].strip()
                 for p in self.get_raw()['participants']]
 
     def _check_for_200(self, response):
         if response.status_code != 200:
-            raise Exception('Received status code of %d' % response.status_code)
+            raise Exception('Received status code of %d' %
+                            response.status_code)
 
         return response
-
